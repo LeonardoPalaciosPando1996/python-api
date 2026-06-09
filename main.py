@@ -8,6 +8,11 @@ class RequestData(BaseModel):
     text: str
 
 
+class Numbers(BaseModel):
+    a: float
+    b: float
+
+
 @app.get("/")
 def home():
     return {
@@ -24,4 +29,12 @@ def process(data: RequestData):
     return {
         "original": data.text,
         "resultado": resultado
+    }
+
+
+@app.post("/sum")
+def sum_numbers(data: Numbers):
+
+    return {
+        "resultado": data.a + data.b
     }
