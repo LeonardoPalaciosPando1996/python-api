@@ -2,14 +2,13 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY . /app
+# copiar SOLO requirements primero (evita cache raro)
+COPY requirements.txt /app/requirements.txt
 
-RUN ls -la /app
-RUN cat /app/requirements.txt
-
-RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-RUN pip freeze
+# ahora copiar código
+COPY app /app/app
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
