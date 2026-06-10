@@ -23,6 +23,4 @@ def forecast(req: RequestData):
     series = prepare_series(df)
     pred = fit_sarima_series(series, req.steps)
 
-    return {
-        "forecast": pred.tolist()
-    }
+    return {"forecast": pred.tolist()}
