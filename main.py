@@ -1,40 +1,28 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import pandas as pd
 
-app = FastAPI()
+from app.model import fit_sarima_series
+from app.preprocessing import prepare_series
 
+app = FastAPI(title="SARIMA API")
 
 class RequestData(BaseModel):
-    text: str
+    dates: list
+    values: list
+    steps: int = 12
 
+@app.post("/forecast")
+def forecast(req: RequestData):
 
-class Numbers(BaseModel):
-    a: float
-    b: float
+    df = pd.DataFrame({
+        "ds": pd.to_datetime(req.dates),
+        "y": req.values
+    })
 
-
-@app.get("/")
-def home():
-    return {
-        "status": "ok",
-        "message": "API funcionando correctamente"
-    }
-
-
-@app.post("/process")
-def process(data: RequestData):
-
-    resultado = data.text.upper()
+    series = prepare_series(df)
+    pred = fit_sarima_series(series, req.steps)
 
     return {
-        "original": data.text,
-        "resultado": resultado
-    }
-
-
-@app.post("/sum")
-def sum_numbers(data: Numbers):
-
-    return {
-        "resultado": data.a + data.b
+        "forecast": pred.tolist()
     }
